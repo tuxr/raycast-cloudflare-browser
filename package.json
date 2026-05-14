@@ -98,7 +98,7 @@
         {
           "name": "selector",
           "type": "text",
-          "placeholder": "h1, .price",
+          "placeholder": "h1, h2",
           "required": true
         },
         {

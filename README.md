@@ -45,7 +45,7 @@ Takes a CSS selector (required) and an optional URL. Examples:
 
 | Selector | Use case |
 | --- | --- |
-| `h1` | Page headline |
+| `h1, h2` | Page headings (any level) |
 | `.titleline > a` on `news.ycombinator.com` | Hacker News story titles |
 | `[data-price]` on a pricing page | Pricing tier values |
 | `article h2 a` on a blog index | Post titles plus their links |
