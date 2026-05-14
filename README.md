@@ -74,9 +74,11 @@ The AI never sees your Cloudflare credentials. Only the HTML extracted by Cloudf
 
 ### Changing the Detonate model
 
-Open the extension preferences and change the **Detonate Model** dropdown. The list covers all current-generation models exposed by Raycast AI: OpenAI's GPT-5.x family, Anthropic's Claude 4.5/4.6/4.7, Google's Gemini 3.x and 2.5, xAI's Grok 4.x, plus DeepSeek, Mistral Large, and Kimi.
+By default, Detonate uses your **Raycast AI default model** (configured in Raycast Settings → AI). That's where you'll see model metadata like vision support, reasoning level, and speed.
 
-Defaults to GPT-5.4 mini, which produces reliable structured output at low cost and latency. If the model you pick fails the schema check, run Detonate again or pick a different one.
+If you want a different model for Detonate than your global default, the extension preferences include a **Detonate Model** dropdown with every current-generation Raycast AI model: OpenAI GPT-5.x, Anthropic Claude 4.5/4.6/4.7, Google Gemini 3.x and 2.5, xAI Grok 4.x, plus DeepSeek, Mistral Large, and Kimi.
+
+Models that don't return reliable JSON will fail the schema check. Re-run Detonate or pick a different model if that happens.
 
 ## Ask Cloudflare Browser (AI Chat)
 

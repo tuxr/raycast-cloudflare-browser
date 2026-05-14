@@ -32,9 +32,10 @@
       "description": "AI model used by Detonate URL for phishing analysis.",
       "type": "dropdown",
       "required": false,
-      "default": "OpenAI_GPT-5.4_mini",
+      "default": "default",
       "data": [
-        { "title": "GPT-5.4 mini (recommended)", "value": "OpenAI_GPT-5.4_mini" },
+        { "title": "Use Raycast Default", "value": "default" },
+        { "title": "GPT-5.4 mini", "value": "OpenAI_GPT-5.4_mini" },
         { "title": "GPT-5.4", "value": "OpenAI_GPT-5.4" },
         { "title": "GPT-5.4 nano", "value": "OpenAI_GPT-5.4_nano" },
         { "title": "GPT-5.3 Instant", "value": "OpenAI_GPT-5.3_Instant" },
