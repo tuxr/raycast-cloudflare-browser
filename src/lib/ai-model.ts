@@ -4,7 +4,7 @@ type Prefs = {
   aiModel?: string;
 };
 
-const DEFAULT_MODEL_KEY = "OpenAI_GPT-5_mini";
+const DEFAULT_MODEL_KEY = "OpenAI_GPT-5.4_mini";
 
 export function detonateModel(): AI.Model {
   const { aiModel } = getPreferenceValues<Prefs>();

@@ -13,4 +13,4 @@
 - Configuration via extension preferences (Cloudflare Account ID and API Token).
 - Smart error handling with one-click recovery actions for auth, rate-limit, and missing-setup failures.
 - AI Tools (Ask Cloudflare Browser): four tools (screenshot, extract-markdown, extract-links, detonate) exposed to Raycast AI Chat so the extension's capabilities can be invoked in natural language.
-- Configurable Detonate AI model via the extension preferences dropdown (GPT-5 mini default, plus GPT-5, Claude 4.6 Sonnet, Claude 4.7 Opus).
+- Configurable Detonate AI model via the extension preferences dropdown. 33 current-generation models exposed including OpenAI GPT-5.x, Anthropic Claude 4.5/4.6/4.7, Google Gemini 3.x and 2.5, xAI Grok 4.x, plus DeepSeek, Mistral, and Kimi. Defaults to GPT-5.4 mini.

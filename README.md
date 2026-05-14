@@ -68,20 +68,15 @@ Use Copy Markdown Report to paste the verdict into an IR ticket or Slack thread.
 
 ### Raycast Pro and Detonate URL
 
-Detonate URL uses [Raycast AI](https://www.raycast.com/pro) (GPT-5 mini by default) and so requires a Raycast Pro subscription. The other five commands work on any Raycast plan, including the free tier.
+Detonate URL uses [Raycast AI](https://www.raycast.com/pro) (GPT-5.4 mini by default) and so requires a Raycast Pro subscription. The other five commands work on any Raycast plan, including the free tier.
 
 The AI never sees your Cloudflare credentials. Only the HTML extracted by Cloudflare Browser Run is included in the prompt.
 
 ### Changing the Detonate model
 
-Open the extension preferences and change the **Detonate Model** dropdown to one of:
+Open the extension preferences and change the **Detonate Model** dropdown. The list covers all current-generation models exposed by Raycast AI: OpenAI's GPT-5.x family, Anthropic's Claude 4.5/4.6/4.7, Google's Gemini 3.x and 2.5, xAI's Grok 4.x, plus DeepSeek, Mistral Large, and Kimi.
 
-- GPT-5 mini (default, fast)
-- GPT-5
-- Claude 4.6 Sonnet
-- Claude 4.7 Opus
-
-The dropdown maps to the corresponding model in Raycast AI. Slower models tend to produce more careful reasoning at higher cost.
+Defaults to GPT-5.4 mini, which produces reliable structured output at low cost and latency. If the model you pick fails the schema check, run Detonate again or pick a different one.
 
 ## Ask Cloudflare Browser (AI Chat)
 
@@ -141,7 +136,7 @@ Some pages take longer than the default 30-second timeout to fully render. Try t
 
 ### Detonate returns "AI response did not match the expected schema"
 
-The model returned non-JSON output. This is rare with GPT-5 mini at low creativity but can happen on unusual page content. Run the command again, or change the default AI model in Raycast's AI preferences.
+The model returned non-JSON output. This is rare with GPT-5.4 mini at low creativity but can happen on unusual page content. Run the command again, or change the default AI model in Raycast's AI preferences.
 
 ## Pricing notes
 
