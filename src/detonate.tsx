@@ -13,6 +13,7 @@ import { useEffect, useRef, useState } from "react";
 import { writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
+import { detonateModel } from "./lib/ai-model";
 import { callBrowserRun } from "./lib/client";
 import { resolveUrl } from "./lib/url-input";
 import {
@@ -41,8 +42,6 @@ type SnapshotResponse = {
   };
   success?: boolean;
 };
-
-const AI_MODEL = AI.Model["OpenAI_GPT-5_mini"];
 
 export default function Command(props: LaunchProps<{ arguments: Arguments }>) {
   const [verdict, setVerdict] = useState<DetonateVerdict | null>(null);
@@ -90,7 +89,7 @@ export default function Command(props: LaunchProps<{ arguments: Arguments }>) {
         toast.title = "Analyzing…";
 
         const raw = await AI.ask(phishingPrompt(target, html), {
-          model: AI_MODEL,
+          model: detonateModel(),
           creativity: "low",
         });
         const parsed = parseVerdict(raw);

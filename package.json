@@ -25,6 +25,20 @@
       "type": "password",
       "required": true,
       "placeholder": "Cloudflare API token"
+    },
+    {
+      "name": "aiModel",
+      "title": "Detonate Model",
+      "description": "AI model used by Detonate URL for phishing analysis.",
+      "type": "dropdown",
+      "required": false,
+      "default": "OpenAI_GPT-5_mini",
+      "data": [
+        { "title": "GPT-5 mini (default, fast)", "value": "OpenAI_GPT-5_mini" },
+        { "title": "GPT-5", "value": "OpenAI_GPT-5" },
+        { "title": "Claude 4.6 Sonnet", "value": "Anthropic_Claude_4.6_Sonnet" },
+        { "title": "Claude 4.7 Opus", "value": "Anthropic_Claude_4.7_Opus" }
+      ]
     }
   ],
   "commands": [
@@ -125,6 +139,31 @@
       ]
     }
   ],
+  "tools": [
+    {
+      "name": "screenshot",
+      "title": "Screenshot URL",
+      "description": "Capture a PNG screenshot of a URL on Cloudflare's edge. Returns the local file path. Use when the user asks to see what a page looks like."
+    },
+    {
+      "name": "extract-markdown",
+      "title": "Extract Markdown",
+      "description": "Render a webpage and return its content as clean Markdown. Use when the user asks about the textual content of a URL or wants to summarize, search, or analyze a page."
+    },
+    {
+      "name": "extract-links",
+      "title": "Extract Links",
+      "description": "List every link on a webpage with hostnames. Use for outbound-domain audits or to enumerate sublinks on an index page."
+    },
+    {
+      "name": "detonate",
+      "title": "Detonate URL",
+      "description": "Run an AI phishing triage on a URL. Returns risk level (low/medium/high), reasoning, brand impersonation status, login form detection, and a list of suspicious indicators. Use whenever a user asks if a URL is safe, suspicious, or phishing."
+    }
+  ],
+  "ai": {
+    "instructions": "You help users render, screenshot, and analyze URLs safely via Cloudflare Browser Run. The user's Cloudflare credentials never leave their machine. Tool selection rules: for security questions ('is this safe?', 'is this phishing?', 'check this link'), always use detonate. For 'what does this page say?' or 'summarize this URL', use extract-markdown. For 'what does this page link to?' or outbound-domain audits, use extract-links. For 'what does this page look like?' or visual evidence, use screenshot. Always pass fully-qualified http(s) URLs; do not invent URLs the user did not provide."
+  },
   "dependencies": {
     "@raycast/api": "^1.80.0",
     "@raycast/utils": "^1.17.0"

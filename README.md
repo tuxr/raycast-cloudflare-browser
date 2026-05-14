@@ -72,6 +72,35 @@ Detonate URL uses [Raycast AI](https://www.raycast.com/pro) (GPT-5 mini by defau
 
 The AI never sees your Cloudflare credentials. Only the HTML extracted by Cloudflare Browser Run is included in the prompt.
 
+### Changing the Detonate model
+
+Open the extension preferences and change the **Detonate Model** dropdown to one of:
+
+- GPT-5 mini (default, fast)
+- GPT-5
+- Claude 4.6 Sonnet
+- Claude 4.7 Opus
+
+The dropdown maps to the corresponding model in Raycast AI. Slower models tend to produce more careful reasoning at higher cost.
+
+## Ask Cloudflare Browser (AI Chat)
+
+This extension exposes its capabilities as Raycast AI tools, so you can call them from AI Chat without invoking a specific command. Available tools:
+
+- **Screenshot URL** for visual evidence of a page
+- **Extract Markdown** to read page content
+- **Extract Links** to enumerate outbound links
+- **Detonate URL** for phishing triage with a structured verdict
+
+In Raycast AI Chat, ask things like:
+
+- *"Is the URL in my clipboard phishing?"*
+- *"Summarize https://example.com/article-name"*
+- *"What domains does this docs page link out to?"*
+- *"Show me what this URL looks like without opening it"*
+
+Tools require a Raycast Pro subscription for AI Chat access.
+
 ## Setup
 
 You need two values from Cloudflare. Both are prompted for on first run.

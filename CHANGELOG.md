@@ -12,3 +12,5 @@
 - URL resolution across all commands: command argument, then selected text, then clipboard.
 - Configuration via extension preferences (Cloudflare Account ID and API Token).
 - Smart error handling with one-click recovery actions for auth, rate-limit, and missing-setup failures.
+- AI Tools (Ask Cloudflare Browser): four tools (screenshot, extract-markdown, extract-links, detonate) exposed to Raycast AI Chat so the extension's capabilities can be invoked in natural language.
+- Configurable Detonate AI model via the extension preferences dropdown (GPT-5 mini default, plus GPT-5, Claude 4.6 Sonnet, Claude 4.7 Opus).
