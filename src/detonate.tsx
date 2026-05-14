@@ -119,9 +119,7 @@ export default function Command(props: LaunchProps<{ arguments: Arguments }>) {
           color={riskColor(verdict.risk)}
         />
       </Detail.Metadata.TagList>
-      {url && (
-        <Detail.Metadata.Link title="Source" target={url} text={url} />
-      )}
+      {url && <Detail.Metadata.Link title="Source" target={url} text={url} />}
       {verdict.brand_impersonated && (
         <Detail.Metadata.Label
           title="Brand impersonated"

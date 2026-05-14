@@ -107,7 +107,9 @@ export default function Command(props: LaunchProps<{ arguments: Arguments }>) {
             icon={Icon.Code}
             actions={
               <ActionPanel>
-                {text && <Action.CopyToClipboard title="Copy Text" content={text} />}
+                {text && (
+                  <Action.CopyToClipboard title="Copy Text" content={text} />
+                )}
                 {m.html && (
                   <Action.CopyToClipboard
                     title="Copy HTML"

@@ -58,10 +58,7 @@ export default function Command(props: LaunchProps<{ arguments: Arguments }>) {
           responseType: "binary",
         });
 
-        const outPath = join(
-          environment.supportPath,
-          `page-${Date.now()}.pdf`,
-        );
+        const outPath = join(environment.supportPath, `page-${Date.now()}.pdf`);
         await writeFile(outPath, Buffer.from(buf));
         const stats = await stat(outPath);
 

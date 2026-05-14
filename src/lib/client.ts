@@ -67,8 +67,14 @@ export async function callBrowserRun<T = unknown>(
 
   if (!res.ok) {
     const retryHeader = res.headers.get("retry-after");
-    const retryAfterSeconds = retryHeader ? parseRetryAfter(retryHeader) : undefined;
-    throw new BrowserRunError(res.status, await readError(res), retryAfterSeconds);
+    const retryAfterSeconds = retryHeader
+      ? parseRetryAfter(retryHeader)
+      : undefined;
+    throw new BrowserRunError(
+      res.status,
+      await readError(res),
+      retryAfterSeconds,
+    );
   }
 
   const type: ResponseType = opts.responseType ?? "json";

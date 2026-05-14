@@ -77,9 +77,7 @@ export async function handleBrowserRunError(
     return {
       title: "Rate limited",
       body: `Wait ${wait} and try again.`,
-      metadata: (
-        <RateLimitMetadata retryAfterSeconds={err.retryAfterSeconds} />
-      ),
+      metadata: <RateLimitMetadata retryAfterSeconds={err.retryAfterSeconds} />,
     };
   }
 

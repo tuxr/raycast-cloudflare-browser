@@ -23,8 +23,8 @@ export function phishingPrompt(url: string, html: string): string {
     "Be conservative and skeptical — don't flag legitimate sites as high risk, but don't miss obvious phishing either.",
     "",
     "Pay special attention to:",
-    "- <form action=\"…\"> URLs (phishing often POSTs credentials to unrelated domains)",
-    "- <input type=\"password\"> or 2FA-related inputs",
+    '- <form action="…"> URLs (phishing often POSTs credentials to unrelated domains)',
+    '- <input type="password"> or 2FA-related inputs',
     "- Brand impersonation via favicon, logos, or copy that mimics a known service",
     "- Mismatched domains between page branding and actual host",
     "",
@@ -64,9 +64,7 @@ export function parseVerdict(raw: string): DetonateVerdict {
 }
 
 function stripFences(raw: string): string {
-  return raw
-    .replace(/^\s*```(?:json)?\s*/i, "")
-    .replace(/```\s*$/i, "");
+  return raw.replace(/^\s*```(?:json)?\s*/i, "").replace(/```\s*$/i, "");
 }
 
 function isVerdict(x: unknown): x is DetonateVerdict {
@@ -75,7 +73,8 @@ function isVerdict(x: unknown): x is DetonateVerdict {
   return (
     (v.risk === "low" || v.risk === "medium" || v.risk === "high") &&
     typeof v.reasoning === "string" &&
-    (v.brand_impersonated === null || typeof v.brand_impersonated === "string") &&
+    (v.brand_impersonated === null ||
+      typeof v.brand_impersonated === "string") &&
     typeof v.login_form_present === "boolean" &&
     typeof v.asks_for_credentials === "boolean" &&
     typeof v.asks_for_2fa === "boolean" &&
