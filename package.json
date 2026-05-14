@@ -1,0 +1,147 @@
+{
+  "$schema": "https://www.raycast.com/schemas/extension.json",
+  "name": "cloudflare-browser",
+  "title": "Cloudflare Browser",
+  "description": "Render, screenshot, and extract data from any URL on Cloudflare's edge.",
+  "icon": "extension-icon.png",
+  "author": "tuxr",
+  "license": "MIT",
+  "platforms": ["macOS"],
+  "categories": ["Web", "Security"],
+  "keywords": ["cloudflare", "browser", "screenshot", "url", "security", "phishing", "render", "sandbox"],
+  "preferences": [
+    {
+      "name": "accountId",
+      "title": "Account ID",
+      "description": "From the Cloudflare dashboard sidebar.",
+      "type": "textfield",
+      "required": true,
+      "placeholder": "e.g. 8c4a7b…"
+    },
+    {
+      "name": "apiToken",
+      "title": "API Token",
+      "description": "Token with Browser Rendering: Edit permission.",
+      "type": "password",
+      "required": true,
+      "placeholder": "Cloudflare API token"
+    }
+  ],
+  "commands": [
+    {
+      "name": "screenshot",
+      "title": "Screenshot URL",
+      "subtitle": "Cloudflare Browser",
+      "description": "Capture a screenshot of any URL.",
+      "mode": "view",
+      "arguments": [
+        {
+          "name": "url",
+          "type": "text",
+          "placeholder": "URL (optional — uses selection or clipboard)",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "pdf",
+      "title": "Save URL as PDF",
+      "subtitle": "Cloudflare Browser",
+      "description": "Render any URL to PDF.",
+      "mode": "view",
+      "arguments": [
+        {
+          "name": "url",
+          "type": "text",
+          "placeholder": "URL (optional — uses selection or clipboard)",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "markdown",
+      "title": "Convert URL to Markdown",
+      "subtitle": "Cloudflare Browser",
+      "description": "Convert any webpage to clean Markdown.",
+      "mode": "view",
+      "arguments": [
+        {
+          "name": "url",
+          "type": "text",
+          "placeholder": "URL (optional — uses selection or clipboard)",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "links",
+      "title": "Get URL Links",
+      "subtitle": "Cloudflare Browser",
+      "description": "Extract every link on a webpage.",
+      "mode": "view",
+      "arguments": [
+        {
+          "name": "url",
+          "type": "text",
+          "placeholder": "URL (optional — uses selection or clipboard)",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "scrape",
+      "title": "Scrape URL",
+      "subtitle": "Cloudflare Browser",
+      "description": "Scrape elements from a webpage by CSS selector.",
+      "mode": "view",
+      "arguments": [
+        {
+          "name": "selector",
+          "type": "text",
+          "placeholder": "CSS selector (e.g. h1, .price)",
+          "required": true
+        },
+        {
+          "name": "url",
+          "type": "text",
+          "placeholder": "URL (optional — uses selection or clipboard)",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "detonate",
+      "title": "Detonate URL",
+      "subtitle": "Cloudflare Browser",
+      "description": "Render a URL safely and run AI phishing triage. Requires Raycast Pro.",
+      "mode": "view",
+      "arguments": [
+        {
+          "name": "url",
+          "type": "text",
+          "placeholder": "URL (optional — uses selection or clipboard)",
+          "required": false
+        }
+      ]
+    }
+  ],
+  "dependencies": {
+    "@raycast/api": "^1.80.0",
+    "@raycast/utils": "^1.17.0"
+  },
+  "devDependencies": {
+    "@raycast/eslint-config": "^1.0.11",
+    "@types/node": "22.13.10",
+    "@types/react": "19.0.10",
+    "eslint": "^9.22.0",
+    "prettier": "^3.5.3",
+    "typescript": "^5.8.2"
+  },
+  "scripts": {
+    "build": "ray build",
+    "dev": "ray develop",
+    "fix-lint": "ray lint --fix",
+    "lint": "ray lint",
+    "publish": "npx @raycast/api@latest publish"
+  }
+}
