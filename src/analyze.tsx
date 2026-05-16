@@ -5,15 +5,17 @@ import {
   Color,
   Detail,
   environment,
+  Icon,
   LaunchProps,
   showToast,
   Toast,
+  updateCommandMetadata,
 } from "@raycast/api";
 import { useEffect, useRef, useState } from "react";
 import { writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
-import { detonateModel } from "./lib/ai-model";
+
 import { callBrowserRun } from "./lib/client";
 import { resolveUrl } from "./lib/url-input";
 import {
@@ -21,15 +23,16 @@ import {
   failNoUrl,
   handleBrowserRunError,
   HelpActions,
+  MissingPreferencesActions,
   type RenderableError,
 } from "./lib/error-ux";
 import {
-  type DetonateVerdict,
+  type AnalyzeVerdict,
   type RiskLevel,
   parseVerdict,
-  phishingPrompt,
+  analyzePrompt,
   renderReport,
-} from "./lib/detonate-schema";
+} from "./lib/analyze-schema";
 
 type Arguments = {
   url?: string;
@@ -44,7 +47,7 @@ type SnapshotResponse = {
 };
 
 export default function Command(props: LaunchProps<{ arguments: Arguments }>) {
-  const [verdict, setVerdict] = useState<DetonateVerdict | null>(null);
+  const [verdict, setVerdict] = useState<AnalyzeVerdict | null>(null);
   const [imagePath, setImagePath] = useState<string | null>(null);
   const [url, setUrl] = useState<string>("");
   const [isLoading, setIsLoading] = useState(true);
@@ -65,7 +68,7 @@ export default function Command(props: LaunchProps<{ arguments: Arguments }>) {
 
         const toast = await showToast({
           style: Toast.Style.Animated,
-          title: "Detonating…",
+          title: "Loading…",
           message: target,
         });
 
@@ -81,19 +84,22 @@ export default function Command(props: LaunchProps<{ arguments: Arguments }>) {
 
         const outPath = join(
           environment.supportPath,
-          `detonate-${Date.now()}.png`,
+          `analyze-${Date.now()}.png`,
         );
         await writeFile(outPath, Buffer.from(screenshotB64, "base64"));
         setImagePath(outPath);
 
         toast.title = "Analyzing…";
 
-        const raw = await AI.ask(phishingPrompt(target, html), {
-          model: detonateModel(),
+        const raw = await AI.ask(analyzePrompt(target, html), {
           creativity: "low",
         });
         const parsed = parseVerdict(raw);
         setVerdict(parsed);
+
+        await updateCommandMetadata({
+          subtitle: `${parsed.risk.toUpperCase()} risk`,
+        });
 
         toast.style = Toast.Style.Success;
         toast.title = riskTitle(parsed.risk);
@@ -156,22 +162,37 @@ export default function Command(props: LaunchProps<{ arguments: Arguments }>) {
       metadata={error?.metadata ?? successMetadata}
       actions={
         <ActionPanel>
-          {url && <Action.OpenInBrowser title="Open Original URL" url={url} />}
-          {verdict && url && (
-            <Action.CopyToClipboard
-              title="Copy Markdown Report"
-              content={renderReport(verdict, url)}
-              shortcut={{ modifiers: ["cmd", "shift"], key: "c" }}
-            />
+          {error?.title === "Not Configured" ? (
+            <MissingPreferencesActions />
+          ) : (
+            <>
+              {verdict && url && (
+                <Action.CopyToClipboard
+                  title="Copy Markdown Report"
+                  icon={Icon.Clipboard}
+                  content={renderReport(verdict, url)}
+                  shortcut={{ modifiers: ["cmd", "shift"], key: "c" }}
+                />
+              )}
+              {url && (
+                <Action.OpenInBrowser
+                  title="Open Original URL"
+                  url={url}
+                  icon={Icon.ArrowUpRight}
+                  shortcut={{ modifiers: ["cmd"], key: "o" }}
+                />
+              )}
+              {imagePath && (
+                <Action.ShowInFinder
+                  title="Show Screenshot in Finder"
+                  path={imagePath}
+                  icon={Icon.Finder}
+                  shortcut={{ modifiers: ["cmd"], key: "f" }}
+                />
+              )}
+              <HelpActions />
+            </>
           )}
-          {imagePath && (
-            <Action.ShowInFinder
-              title="Show Screenshot in Finder"
-              path={imagePath}
-              shortcut={{ modifiers: ["cmd"], key: "f" }}
-            />
-          )}
-          <HelpActions />
         </ActionPanel>
       }
     />
@@ -191,15 +212,15 @@ function riskEmoji(risk: RiskLevel): string {
 }
 
 function renderVerdictMarkdown(
-  verdict: DetonateVerdict | null,
+  verdict: AnalyzeVerdict | null,
   imagePath: string | null,
   url: string,
   isLoading: boolean,
 ): string {
   if (!verdict) {
     return isLoading
-      ? `# Detonating…\n\n${url ? `\`${url}\`` : ""}`
-      : "# Detonate";
+      ? `# Loading…\n\n${url ? `\`${url}\`` : ""}`
+      : `# Analyze\n\n${url ? `\`${url}\`` : ""}`;
   }
   const emoji = riskEmoji(verdict.risk);
   const title = riskTitle(verdict.risk);

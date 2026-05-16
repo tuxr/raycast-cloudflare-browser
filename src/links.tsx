@@ -6,6 +6,7 @@ import {
   List,
   showToast,
   Toast,
+  updateCommandMetadata,
 } from "@raycast/api";
 import { useEffect, useRef, useState } from "react";
 import { callBrowserRun } from "./lib/client";
@@ -14,6 +15,7 @@ import {
   failNoUrl,
   handleBrowserRunError,
   HelpActions,
+  MissingPreferencesEmptyView,
   type RenderableError,
 } from "./lib/error-ux";
 
@@ -55,7 +57,7 @@ export default function Command(props: LaunchProps<{ arguments: Arguments }>) {
 
         const toast = await showToast({
           style: Toast.Style.Animated,
-          title: "Extracting…",
+          title: "Loading…",
           message: target,
         });
 
@@ -66,6 +68,10 @@ export default function Command(props: LaunchProps<{ arguments: Arguments }>) {
           .map(toLink)
           .filter((l): l is Link => l !== null);
         setLinks(parsed);
+
+        await updateCommandMetadata({
+          subtitle: `${parsed.length} link${parsed.length === 1 ? "" : "s"}`,
+        });
 
         toast.style = Toast.Style.Success;
         toast.title = `${parsed.length} link${parsed.length === 1 ? "" : "s"}`;
@@ -78,19 +84,44 @@ export default function Command(props: LaunchProps<{ arguments: Arguments }>) {
     })();
   }, []);
 
+  const hasLinks = !error && links.length > 0;
+
   return (
     <List
       isLoading={isLoading}
       searchBarPlaceholder="Filter links…"
       navigationTitle={url || "Page Links"}
+      actions={
+        hasLinks ? (
+          <ActionPanel>
+            <Action.CopyToClipboard
+              title="Copy All URLs"
+              icon={Icon.Link}
+              content={links.map((l) => l.href).join("\n")}
+              shortcut={{ modifiers: ["cmd", "shift"], key: "c" }}
+            />
+            <Action.CopyToClipboard
+              title="Copy All as Markdown"
+              icon={Icon.Clipboard}
+              content={links
+                .map((l) => `- ${l.text ? `[${l.text}](${l.href})` : l.href}`)
+                .join("\n")}
+            />
+            <HelpActions />
+          </ActionPanel>
+        ) : undefined
+      }
     >
-      {error && (
-        <List.EmptyView
-          icon={Icon.ExclamationMark}
-          title={error.title}
-          description={error.body}
-        />
-      )}
+      {error &&
+        (error.title === "Not Configured" ? (
+          <MissingPreferencesEmptyView />
+        ) : (
+          <List.EmptyView
+            icon={Icon.ExclamationMark}
+            title={error.title}
+            description={error.body}
+          />
+        ))}
       {!isLoading && !error && links.length === 0 && (
         <List.EmptyView icon={Icon.Link} title="No links found" />
       )}
@@ -103,12 +134,17 @@ export default function Command(props: LaunchProps<{ arguments: Arguments }>) {
           icon={Icon.Link}
           actions={
             <ActionPanel>
-              <Action.OpenInBrowser url={link.href} />
-              <Action.CopyToClipboard title="Copy URL" content={link.href} />
+              <Action.OpenInBrowser url={link.href} icon={Icon.Link} />
+              <Action.CopyToClipboard
+                title="Copy URL"
+                content={link.href}
+                icon={Icon.Clipboard}
+              />
               {url && (
                 <Action.OpenInBrowser
                   title="Open Source Page"
                   url={url}
+                  icon={Icon.ArrowUpRight}
                   shortcut={{ modifiers: ["cmd"], key: "o" }}
                 />
               )}

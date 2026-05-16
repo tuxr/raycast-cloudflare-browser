@@ -2,6 +2,7 @@ import {
   Action,
   ActionPanel,
   Detail,
+  Icon,
   LaunchProps,
   showToast,
   Toast,
@@ -14,6 +15,7 @@ import {
   failNoUrl,
   handleBrowserRunError,
   HelpActions,
+  MissingPreferencesActions,
   type RenderableError,
 } from "./lib/error-ux";
 
@@ -47,7 +49,7 @@ export default function Command(props: LaunchProps<{ arguments: Arguments }>) {
 
         const toast = await showToast({
           style: Toast.Style.Animated,
-          title: "Converting…",
+          title: "Loading…",
           message: target,
         });
 
@@ -69,7 +71,7 @@ export default function Command(props: LaunchProps<{ arguments: Arguments }>) {
 
   const markdown = error
     ? errorMarkdown(error)
-    : (content ?? `# Converting…\n\n${url ? `\`${url}\`` : ""}`);
+    : (content ?? `# Loading…\n\n${url ? `\`${url}\`` : ""}`);
 
   return (
     <Detail
@@ -78,24 +80,36 @@ export default function Command(props: LaunchProps<{ arguments: Arguments }>) {
       metadata={error?.metadata}
       actions={
         <ActionPanel>
-          {content && (
-            <Action.CopyToClipboard title="Copy Markdown" content={content} />
+          {error?.title === "Not Configured" ? (
+            <MissingPreferencesActions />
+          ) : (
+            <>
+              {content && (
+                <Action.CopyToClipboard
+                  title="Copy Markdown"
+                  icon={Icon.Clipboard}
+                  content={content}
+                  shortcut={{ modifiers: ["cmd", "shift"], key: "c" }}
+                />
+              )}
+              {url && (
+                <Action.OpenInBrowser
+                  title="Open Original URL"
+                  url={url}
+                  icon={Icon.ArrowUpRight}
+                  shortcut={{ modifiers: ["cmd"], key: "o" }}
+                />
+              )}
+              {url && (
+                <Action.CopyToClipboard
+                  title="Copy URL"
+                  content={url}
+                  icon={Icon.Clipboard}
+                />
+              )}
+              <HelpActions />
+            </>
           )}
-          {url && (
-            <Action.OpenInBrowser
-              title="Open Original URL"
-              url={url}
-              shortcut={{ modifiers: ["cmd"], key: "o" }}
-            />
-          )}
-          {url && (
-            <Action.CopyToClipboard
-              title="Copy URL"
-              content={url}
-              shortcut={{ modifiers: ["cmd", "shift"], key: "c" }}
-            />
-          )}
-          <HelpActions />
         </ActionPanel>
       }
     />

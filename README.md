@@ -12,12 +12,11 @@ Sometimes you need to see what a URL actually does, without letting the page tou
 
 | Command | What it does |
 | --- | --- |
-| Screenshot URL | Capture a PNG screenshot of any URL. |
-| Save URL as PDF | Render any URL to a PDF document. |
-| Convert URL to Markdown | Extract clean Markdown from any webpage. |
-| Get URL Links | List every link on a page, filterable, with hostnames. |
-| Scrape URL | Extract elements from a page by CSS selector. |
-| Detonate URL | AI-powered phishing triage: risk badge, screenshot, structured indicators. Requires Raycast Pro. |
+| Screenshot | Capture a PNG screenshot of any URL. |
+| PDF | Render any URL to a PDF document. |
+| Markdown | Extract clean Markdown from any webpage. |
+| Links | List every link on a page, filterable, with hostnames. |
+| Analyze | AI-powered security analysis: phishing detection, login forms, brand impersonation. Requires Raycast Pro. |
 
 Every command resolves the URL in this order: command argument, then selected text on screen, then clipboard. So you can paste-and-go, select-and-go, or pass an explicit URL.
 
@@ -39,22 +38,11 @@ Returns the page as clean Markdown rendered in a Detail view. Use Copy Markdown 
 
 Renders every link on the page as a filterable list. Each row shows the link plus its hostname. Useful for outbound-domain audits during incident response, or for finding every entry on a documentation index page.
 
-### Scrape URL
+### Analyze
 
-Takes a CSS selector (required) and an optional URL. Examples:
+Runs an AI security analysis on a URL using Cloudflare's edge browser + Raycast AI. It returns a risk level (Low / Medium / High), reasoning, detected brand impersonation, login form detection, and a list of suspicious indicators.
 
-| Selector | Use case |
-| --- | --- |
-| `h1, h2` | Page headings (any level) |
-| `.titleline > a` on `news.ycombinator.com` | Hacker News story titles |
-| `[data-price]` on a pricing page | Pricing tier values |
-| `article h2 a` on a blog index | Post titles plus their links |
-| `form` on a suspicious URL | Find login forms (security triage) |
-| `input[type="password"]` | Detect credential-harvesting forms |
-
-For each match you get Copy Text, Copy HTML, and Open Source Page actions.
-
-### Detonate URL
+Use it when you want to quickly assess if a link is phishing, malicious, or impersonating a brand. A screenshot of the page is captured and shown alongside the verdict. Requires Raycast Pro.
 
 Sends a single Cloudflare Browser Run snapshot (HTML plus screenshot) to Raycast AI with a phishing-triage prompt. Returns a risk badge (low, medium, high), the model's reasoning, and structured indicators:
 
@@ -66,19 +54,19 @@ Sends a single Cloudflare Browser Run snapshot (HTML plus screenshot) to Raycast
 
 Use Copy Markdown Report to paste the verdict into an IR ticket or Slack thread. The report includes the source URL, risk level, and every indicator above.
 
-### Raycast Pro and Detonate URL
+### Raycast Pro and Analyze
 
-Detonate URL uses [Raycast AI](https://www.raycast.com/pro) (GPT-5.4 mini by default) and so requires a Raycast Pro subscription. The other five commands work on any Raycast plan, including the free tier.
+Analyze uses [Raycast AI](https://www.raycast.com/pro) and requires a Raycast Pro subscription. The other four commands work on any Raycast plan, including the free tier.
 
 The AI never sees your Cloudflare credentials. Only the HTML extracted by Cloudflare Browser Run is included in the prompt.
 
-### Changing the Detonate model
+### Changing the Analyze model
 
-By default, Detonate uses your **Raycast AI default model** (configured in Raycast Settings → AI). That's where you'll see model metadata like vision support, reasoning level, and speed.
+By default, Analyze uses your **Raycast AI default model** (configured in Raycast Settings → AI).
 
-If you want a different model for Detonate than your global default, the extension preferences include a **Detonate Model** dropdown with every current-generation Raycast AI model: OpenAI GPT-5.x, Anthropic Claude 4.5/4.6/4.7, Google Gemini 3.x and 2.5, xAI Grok 4.x, plus DeepSeek, Mistral Large, and Kimi.
+If you want to override it for Analyze only, the extension preferences include an **Analyze Model** dropdown with all current Raycast AI models.
 
-Models that don't return reliable JSON will fail the schema check. Re-run Detonate or pick a different model if that happens.
+Models that don't return reliable JSON will fail the schema check. Re-run the command or pick a different model.
 
 ## Ask Cloudflare Browser (AI Chat)
 
@@ -87,7 +75,7 @@ This extension exposes its capabilities as Raycast AI tools, so you can call the
 - **Screenshot URL** for visual evidence of a page
 - **Extract Markdown** to read page content
 - **Extract Links** to enumerate outbound links
-- **Detonate URL** for phishing triage with a structured verdict
+- **Analyze** for security and phishing analysis with a structured verdict
 
 In Raycast AI Chat, ask things like:
 
@@ -120,7 +108,7 @@ Click Continue to summary, then Create Token, and copy the value. Paste it into 
 
 ### Lost the token-creation page?
 
-From any command in this extension, press `⌘H` to open the Cloudflare API Tokens page. If an auth error appears while running a command, the error toast itself offers a one-click action to create a fresh token.
+From any command in this extension, open the Action Panel and use the Help actions (or the error toast) to open the Cloudflare API Tokens page. If an auth error appears while running a command, the error toast itself offers a one-click action to create a fresh token.
 
 ## Troubleshooting
 
@@ -130,27 +118,27 @@ Cloudflare Browser Run caps how many new browsers you can launch per minute. Wor
 
 ### "Auth failed" message
 
-Your API token does not have the `Browser Rendering: Edit` permission, or it has been revoked. Press `⌘H` from any command to open the token page, then create a fresh token following the setup steps above.
+Your API token does not have the `Browser Rendering: Edit` permission, or it has been revoked. Use the Help actions in the Action Panel (or the error toast) to open the token page, then create a fresh token following the setup steps above.
 
 ### Blank or partial screenshot
 
 Some pages take longer than the default 30-second timeout to fully render. Try the URL again. Cloudflare may have cold-started a new browser instance the first time.
 
-### Detonate returns "AI response did not match the expected schema"
+### Analyze returns "AI response did not match the expected schema"
 
-The model returned non-JSON output. This is rare with GPT-5.4 mini at low creativity but can happen on unusual page content. Run the command again, or change the default AI model in Raycast's AI preferences.
+The model returned non-JSON output. Re-run the command, or try a different AI model in the extension preferences.
 
 ## Pricing notes
 
 - **Workers Free:** 10 minutes per day of browser time, 3 concurrent browsers. Enough for casual personal use.
 - **Workers Paid ($5/mo):** 10 browser hours per month included, then $0.09 per additional browser hour. The REST endpoints this extension uses bill on duration only, not concurrency.
 
-Detonate URL uses Raycast AI tokens covered by your Raycast Pro subscription. Workers AI is not billed by this extension. See the [Cloudflare Browser Run pricing page](https://developers.cloudflare.com/browser-run/pricing/) for current Browser Run details.
+Analyze uses Raycast AI tokens covered by your Raycast Pro subscription. Workers AI is not billed by this extension. See the [Cloudflare Browser Run pricing page](https://developers.cloudflare.com/browser-run/pricing/) for current Browser Run details.
 
 ## Privacy
 
 - Your Cloudflare credentials never leave your machine except in `Authorization` headers to `api.cloudflare.com`.
-- For Detonate URL, the page HTML extracted by Cloudflare is sent to Raycast AI as part of the prompt. No other extension data is sent.
+- For Analyze, the page HTML extracted by Cloudflare is sent to Raycast AI as part of the prompt. No other extension data is sent.
 - This extension makes no other network requests and ships no analytics.
 - Screenshots, PDFs, and other saved artifacts are written to Raycast's per-extension support directory on your machine.
 

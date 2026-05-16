@@ -1,6 +1,9 @@
 import {
   Action,
+  ActionPanel,
   Detail,
+  Icon,
+  List,
   open,
   openExtensionPreferences,
   showToast,
@@ -36,8 +39,8 @@ export async function handleBrowserRunError(
       },
     });
     return {
-      title: "Set up required",
-      body: "Add your Cloudflare Account ID and API Token in preferences.",
+      title: "Not Configured",
+      body: "Add your Cloudflare Account ID and API Token with Browser Rendering: Edit permission in extension preferences.",
     };
   }
 
@@ -110,17 +113,10 @@ export function errorMarkdown(error: RenderableError): string {
 
 export function HelpActions(): JSX.Element {
   return (
-    <>
-      <Action.OpenInBrowser
-        title="Create Cloudflare API Token"
-        url={CLOUDFLARE_API_TOKENS_URL}
-        shortcut={{ modifiers: ["cmd"], key: "h" }}
-      />
-      <Action
-        title="Open Extension Preferences"
-        onAction={openExtensionPreferences}
-      />
-    </>
+    <Action
+      title="Open Extension Preferences"
+      onAction={openExtensionPreferences}
+    />
   );
 }
 
@@ -133,7 +129,7 @@ function RateLimitMetadata({
     <Detail.Metadata>
       <Detail.Metadata.Label
         title="Retry after"
-        text={retryAfterSeconds ? `${retryAfterSeconds}s` : "—"}
+        text={retryAfterSeconds ? `${retryAfterSeconds}s` : "-"}
       />
       <Detail.Metadata.Separator />
       <Detail.Metadata.Label title="Free plan" text="~2 browsers/min" />
@@ -144,5 +140,44 @@ function RateLimitMetadata({
         text="Browser Run limits"
       />
     </Detail.Metadata>
+  );
+}
+
+// --- Missing Preferences Empty States ---
+
+export function MissingPreferencesEmptyView() {
+  return (
+    <List.EmptyView
+      icon={Icon.Key}
+      title="Not Configured"
+      description="Add your Cloudflare Account ID and API Token with Browser Rendering: Edit permission in extension preferences."
+      actions={
+        <ActionPanel>
+          <Action
+            title="Open Preferences"
+            onAction={openExtensionPreferences}
+          />
+          <Action.OpenInBrowser
+            title="Create API Token"
+            url={CLOUDFLARE_API_TOKENS_URL}
+          />
+        </ActionPanel>
+      }
+    />
+  );
+}
+
+export function MissingPreferencesActions() {
+  return (
+    <>
+      <Action
+        title="Open Extension Preferences"
+        onAction={openExtensionPreferences}
+      />
+      <Action.OpenInBrowser
+        title="Create Cloudflare API Token"
+        url={CLOUDFLARE_API_TOKENS_URL}
+      />
+    </>
   );
 }

@@ -1,6 +1,6 @@
 export type RiskLevel = "low" | "medium" | "high";
 
-export type DetonateVerdict = {
+export type AnalyzeVerdict = {
   risk: RiskLevel;
   reasoning: string;
   brand_impersonated: string | null;
@@ -12,7 +12,7 @@ export type DetonateVerdict = {
 
 const MAX_HTML_CHARS = 20000;
 
-export function phishingPrompt(url: string, html: string): string {
+export function analyzePrompt(url: string, html: string): string {
   const truncated =
     html.length > MAX_HTML_CHARS
       ? html.slice(0, MAX_HTML_CHARS) + "\n…[truncated]"
@@ -20,7 +20,7 @@ export function phishingPrompt(url: string, html: string): string {
 
   return [
     "You are a security analyst reviewing a webpage for phishing or social-engineering indicators.",
-    "Be conservative and skeptical — don't flag legitimate sites as high risk, but don't miss obvious phishing either.",
+    "Be conservative and skeptical. Don't flag legitimate sites as high risk, but don't miss obvious phishing either.",
     "",
     "Pay special attention to:",
     '- <form action="…"> URLs (phishing often POSTs credentials to unrelated domains)',
@@ -47,7 +47,7 @@ export function phishingPrompt(url: string, html: string): string {
   ].join("\n");
 }
 
-export function parseVerdict(raw: string): DetonateVerdict {
+export function parseVerdict(raw: string): AnalyzeVerdict {
   const cleaned = stripFences(raw).trim();
   let parsed: unknown;
   try {
@@ -67,7 +67,7 @@ function stripFences(raw: string): string {
   return raw.replace(/^\s*```(?:json)?\s*/i, "").replace(/```\s*$/i, "");
 }
 
-function isVerdict(x: unknown): x is DetonateVerdict {
+function isVerdict(x: unknown): x is AnalyzeVerdict {
   if (!x || typeof x !== "object") return false;
   const v = x as Record<string, unknown>;
   return (
@@ -83,9 +83,9 @@ function isVerdict(x: unknown): x is DetonateVerdict {
   );
 }
 
-export function renderReport(verdict: DetonateVerdict, url: string): string {
+export function renderReport(verdict: AnalyzeVerdict, url: string): string {
   return [
-    "# Detonate Report",
+    "# Analyze Report",
     "",
     `**URL:** ${url}`,
     `**Risk:** ${verdict.risk.toUpperCase()}`,

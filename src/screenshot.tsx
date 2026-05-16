@@ -3,6 +3,7 @@ import {
   ActionPanel,
   Detail,
   environment,
+  Icon,
   LaunchProps,
   showToast,
   Toast,
@@ -18,6 +19,7 @@ import {
   failNoUrl,
   handleBrowserRunError,
   HelpActions,
+  MissingPreferencesActions,
   type RenderableError,
 } from "./lib/error-ux";
 
@@ -46,7 +48,7 @@ export default function Command(props: LaunchProps<{ arguments: Arguments }>) {
 
         const toast = await showToast({
           style: Toast.Style.Animated,
-          title: "Rendering…",
+          title: "Loading…",
           message: target,
         });
 
@@ -77,32 +79,57 @@ export default function Command(props: LaunchProps<{ arguments: Arguments }>) {
     ? errorMarkdown(error)
     : imagePath
       ? `![](${pathToFileURL(imagePath).href})`
-      : `# Rendering…\n\n${url ? `\`${url}\`` : ""}`;
+      : `# Loading…\n\n${url ? `\`${url}\`` : ""}`;
+
+  const successMetadata = imagePath ? (
+    <Detail.Metadata>
+      {url && <Detail.Metadata.Link title="Source" target={url} text={url} />}
+      <Detail.Metadata.Label
+        title="File"
+        text={imagePath.split("/").pop() ?? "screenshot.png"}
+      />
+    </Detail.Metadata>
+  ) : undefined;
 
   return (
     <Detail
       isLoading={isLoading}
       markdown={markdown}
-      metadata={error?.metadata}
+      metadata={error?.metadata ?? successMetadata}
       actions={
         <ActionPanel>
-          {imagePath && <Action.OpenWith path={imagePath} />}
-          {imagePath && <Action.ShowInFinder path={imagePath} />}
-          {url && (
-            <Action.OpenInBrowser
-              title="Open Original URL"
-              url={url}
-              shortcut={{ modifiers: ["cmd"], key: "o" }}
-            />
+          {error?.title === "Not Configured" ? (
+            <MissingPreferencesActions />
+          ) : (
+            <>
+              {imagePath && (
+                <Action.OpenWith
+                  title="Open Image"
+                  path={imagePath}
+                  icon={Icon.Image}
+                />
+              )}
+              {imagePath && (
+                <Action.ShowInFinder path={imagePath} icon={Icon.Finder} />
+              )}
+              {url && (
+                <Action.OpenInBrowser
+                  title="Open Original URL"
+                  url={url}
+                  icon={Icon.ArrowUpRight}
+                  shortcut={{ modifiers: ["cmd"], key: "o" }}
+                />
+              )}
+              {url && (
+                <Action.CopyToClipboard
+                  title="Copy URL"
+                  content={url}
+                  icon={Icon.Clipboard}
+                />
+              )}
+              <HelpActions />
+            </>
           )}
-          {url && (
-            <Action.CopyToClipboard
-              title="Copy URL"
-              content={url}
-              shortcut={{ modifiers: ["cmd", "shift"], key: "c" }}
-            />
-          )}
-          <HelpActions />
         </ActionPanel>
       }
     />

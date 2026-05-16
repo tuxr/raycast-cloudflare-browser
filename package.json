@@ -25,56 +25,12 @@
       "type": "password",
       "required": true,
       "placeholder": "Cloudflare API token"
-    },
-    {
-      "name": "aiModel",
-      "title": "Detonate Model",
-      "description": "AI model used by Detonate URL for phishing analysis.",
-      "type": "dropdown",
-      "required": false,
-      "default": "default",
-      "data": [
-        { "title": "Use Raycast Default", "value": "default" },
-        { "title": "GPT-5.4 mini", "value": "OpenAI_GPT-5.4_mini" },
-        { "title": "GPT-5.4", "value": "OpenAI_GPT-5.4" },
-        { "title": "GPT-5.4 nano", "value": "OpenAI_GPT-5.4_nano" },
-        { "title": "GPT-5.3 Instant", "value": "OpenAI_GPT-5.3_Instant" },
-        { "title": "GPT-5.2", "value": "OpenAI_GPT-5.2" },
-        { "title": "GPT-5.2 Instant", "value": "OpenAI_GPT-5.2_Instant" },
-        { "title": "GPT-5.1", "value": "OpenAI_GPT-5.1" },
-        { "title": "GPT-5.1 Instant", "value": "OpenAI_GPT-5.1_Instant" },
-        { "title": "GPT-5", "value": "OpenAI_GPT-5" },
-        { "title": "GPT-5 mini", "value": "OpenAI_GPT-5_mini" },
-        { "title": "GPT-5 nano", "value": "OpenAI_GPT-5_nano" },
-        { "title": "o4 mini", "value": "OpenAI_o4-mini" },
-        { "title": "o3", "value": "OpenAI_o3" },
-        { "title": "Claude 4.7 Opus", "value": "Anthropic_Claude_4.7_Opus" },
-        { "title": "Claude 4.6 Opus", "value": "Anthropic_Claude_4.6_Opus" },
-        { "title": "Claude 4.6 Sonnet", "value": "Anthropic_Claude_4.6_Sonnet" },
-        { "title": "Claude 4.5 Opus", "value": "Anthropic_Claude_4.5_Opus" },
-        { "title": "Claude 4.5 Sonnet", "value": "Anthropic_Claude_4.5_Sonnet" },
-        { "title": "Claude 4.5 Haiku", "value": "Anthropic_Claude_4.5_Haiku" },
-        { "title": "Gemini 3.1 Pro", "value": "Google_Gemini_3.1_Pro" },
-        { "title": "Gemini 3.1 Flash Lite", "value": "Google_Gemini_3.1_Flash_Lite" },
-        { "title": "Gemini 3 Pro", "value": "Google_Gemini_3_Pro" },
-        { "title": "Gemini 3 Flash", "value": "Google_Gemini_3_Flash" },
-        { "title": "Gemini 2.5 Pro", "value": "Google_Gemini_2.5_Pro" },
-        { "title": "Gemini 2.5 Flash", "value": "Google_Gemini_2.5_Flash" },
-        { "title": "Grok 4.20", "value": "xAI_Grok-4.20" },
-        { "title": "Grok 4.1 Fast", "value": "xAI_Grok-4.1_Fast" },
-        { "title": "Grok 4 Fast", "value": "xAI_Grok-4_Fast" },
-        { "title": "Grok 4", "value": "xAI_Grok-4" },
-        { "title": "DeepSeek R1", "value": "DeepSeek_R1" },
-        { "title": "DeepSeek V3", "value": "DeepSeek_V3" },
-        { "title": "Mistral Large 2", "value": "Mistral_Large2" },
-        { "title": "Kimi K2.5", "value": "Together_AI_Kimi_K2.5" }
-      ]
     }
   ],
   "commands": [
     {
       "name": "screenshot",
-      "title": "Screenshot URL",
+      "title": "Screenshot",
       "subtitle": "Cloudflare Browser",
       "description": "Capture a screenshot of any URL.",
       "mode": "view",
@@ -89,7 +45,7 @@
     },
     {
       "name": "pdf",
-      "title": "Save URL as PDF",
+      "title": "PDF",
       "subtitle": "Cloudflare Browser",
       "description": "Render any URL to PDF.",
       "mode": "view",
@@ -104,7 +60,7 @@
     },
     {
       "name": "markdown",
-      "title": "Convert URL to Markdown",
+      "title": "Markdown",
       "subtitle": "Cloudflare Browser",
       "description": "Convert any webpage to clean Markdown.",
       "mode": "view",
@@ -119,9 +75,9 @@
     },
     {
       "name": "links",
-      "title": "Get URL Links",
+      "title": "Links",
       "subtitle": "Cloudflare Browser",
-      "description": "Extract every link on a webpage.",
+      "description": "Extract every link on a webpage with hostnames.",
       "mode": "view",
       "arguments": [
         {
@@ -133,31 +89,10 @@
       ]
     },
     {
-      "name": "scrape",
-      "title": "Scrape URL",
+      "name": "analyze",
+      "title": "Analyze",
       "subtitle": "Cloudflare Browser",
-      "description": "Scrape elements from a webpage by CSS selector.",
-      "mode": "view",
-      "arguments": [
-        {
-          "name": "selector",
-          "type": "text",
-          "placeholder": "h1, h2",
-          "required": true
-        },
-        {
-          "name": "url",
-          "type": "text",
-          "placeholder": "URL",
-          "required": false
-        }
-      ]
-    },
-    {
-      "name": "detonate",
-      "title": "Detonate URL",
-      "subtitle": "Cloudflare Browser",
-      "description": "Render a URL safely and run AI phishing triage. Requires Raycast Pro.",
+      "description": "Run AI security analysis on a URL for phishing, login forms, and brand impersonation. Requires Raycast Pro.",
       "mode": "view",
       "arguments": [
         {
@@ -186,13 +121,13 @@
       "description": "List every link on a webpage with hostnames. Use for outbound-domain audits or to enumerate sublinks on an index page."
     },
     {
-      "name": "detonate",
-      "title": "Detonate URL",
-      "description": "Run an AI phishing triage on a URL. Returns risk level (low/medium/high), reasoning, brand impersonation status, login form detection, and a list of suspicious indicators. Use whenever a user asks if a URL is safe, suspicious, or phishing."
+      "name": "analyze",
+      "title": "Analyze URL",
+      "description": "Run an AI security and phishing analysis on a URL. Returns risk level (low/medium/high), reasoning, brand impersonation status, login form detection, and a list of suspicious indicators. Use whenever a user asks if a URL is safe, suspicious, or phishing."
     }
   ],
   "ai": {
-    "instructions": "You help users render, screenshot, and analyze URLs safely via Cloudflare Browser Run. The user's Cloudflare credentials never leave their machine. Tool selection rules: for security questions ('is this safe?', 'is this phishing?', 'check this link'), always use detonate. For 'what does this page say?' or 'summarize this URL', use extract-markdown. For 'what does this page link to?' or outbound-domain audits, use extract-links. For 'what does this page look like?' or visual evidence, use screenshot. Always pass fully-qualified http(s) URLs; do not invent URLs the user did not provide."
+    "instructions": "You help users render, screenshot, and analyze URLs safely via Cloudflare Browser Run. The user's Cloudflare credentials never leave their machine. Tool selection rules: for security questions ('is this safe?', 'is this phishing?', 'check this link'), always use analyze. For 'what does this page say?' or 'summarize this URL', use extract-markdown. For 'what does this page link to?' or outbound-domain audits, use extract-links. For 'what does this page look like?' or visual evidence, use screenshot. Always pass fully-qualified http(s) URLs; do not invent URLs the user did not provide."
   },
   "dependencies": {
     "@raycast/api": "^1.80.0",

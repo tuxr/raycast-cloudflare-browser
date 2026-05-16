@@ -19,6 +19,7 @@ import {
   failNoUrl,
   handleBrowserRunError,
   HelpActions,
+  MissingPreferencesActions,
   type RenderableError,
 } from "./lib/error-ux";
 
@@ -49,7 +50,7 @@ export default function Command(props: LaunchProps<{ arguments: Arguments }>) {
 
         const toast = await showToast({
           style: Toast.Style.Animated,
-          title: "Rendering PDF…",
+          title: "Loading…",
           message: target,
         });
 
@@ -82,7 +83,7 @@ export default function Command(props: LaunchProps<{ arguments: Arguments }>) {
     ? errorMarkdown(error)
     : ready
       ? "# PDF ready"
-      : `# Rendering PDF…\n\n${url ? `\`${url}\`` : ""}`;
+      : `# Loading…\n\n${url ? `\`${url}\`` : ""}`;
 
   const successMetadata = ready ? (
     <Detail.Metadata>
@@ -107,30 +108,41 @@ export default function Command(props: LaunchProps<{ arguments: Arguments }>) {
       metadata={error?.metadata ?? successMetadata}
       actions={
         <ActionPanel>
-          {pdfPath && (
-            <Action
-              title="Open PDF"
-              icon={Icon.Eye}
-              onAction={() => void open(pdfPath)}
-            />
+          {error?.title === "Not Configured" ? (
+            <MissingPreferencesActions />
+          ) : (
+            <>
+              {pdfPath && (
+                <Action
+                  title="Open PDF"
+                  icon={Icon.Document}
+                  onAction={() => void open(pdfPath)}
+                />
+              )}
+              {pdfPath && (
+                <Action.OpenWith path={pdfPath} icon={Icon.Document} />
+              )}
+              {pdfPath && (
+                <Action.ShowInFinder path={pdfPath} icon={Icon.Finder} />
+              )}
+              {url && (
+                <Action.OpenInBrowser
+                  title="Open Original URL"
+                  url={url}
+                  icon={Icon.ArrowUpRight}
+                  shortcut={{ modifiers: ["cmd"], key: "o" }}
+                />
+              )}
+              {url && (
+                <Action.CopyToClipboard
+                  title="Copy URL"
+                  content={url}
+                  icon={Icon.Clipboard}
+                />
+              )}
+              <HelpActions />
+            </>
           )}
-          {pdfPath && <Action.OpenWith path={pdfPath} />}
-          {pdfPath && <Action.ShowInFinder path={pdfPath} />}
-          {url && (
-            <Action.OpenInBrowser
-              title="Open Original URL"
-              url={url}
-              shortcut={{ modifiers: ["cmd"], key: "o" }}
-            />
-          )}
-          {url && (
-            <Action.CopyToClipboard
-              title="Copy URL"
-              content={url}
-              shortcut={{ modifiers: ["cmd", "shift"], key: "c" }}
-            />
-          )}
-          <HelpActions />
         </ActionPanel>
       }
     />

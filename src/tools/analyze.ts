@@ -1,13 +1,13 @@
 import { AI, environment } from "@raycast/api";
 import { writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { detonateModel } from "../lib/ai-model";
+
 import { callBrowserRun } from "../lib/client";
 import {
-  type DetonateVerdict,
+  type AnalyzeVerdict,
   parseVerdict,
-  phishingPrompt,
-} from "../lib/detonate-schema";
+  analyzePrompt,
+} from "../lib/analyze-schema";
 
 type Input = {
   /** Fully-qualified http(s) URL to triage for phishing and social-engineering indicators. */
@@ -21,22 +21,22 @@ type SnapshotResponse = {
   };
 };
 
-type DetonateToolResult = DetonateVerdict & {
+type AnalyzeToolResult = AnalyzeVerdict & {
   url: string;
   screenshotPath?: string;
 };
 
 /**
- * Run an AI-powered phishing triage on a URL. Renders the page safely on
+ * Run an AI-powered security and phishing analysis on a URL. Renders the page safely on
  * Cloudflare's edge, then sends the HTML to the configured AI model with a
- * conservative phishing-indicator schema. Returns a structured verdict with
+ * conservative security-indicator schema. Returns a structured verdict with
  * risk level, reasoning, brand impersonation, credential/2FA prompts, and a
  * list of suspicious indicators.
  *
  * Always prefer this tool over manual fetching when a user asks "is this URL
  * safe?" or "is this phishing?".
  */
-export default async function tool(input: Input): Promise<DetonateToolResult> {
+export default async function tool(input: Input): Promise<AnalyzeToolResult> {
   const snapshot = await callBrowserRun<SnapshotResponse>("snapshot", {
     body: { url: input.url },
   });
@@ -49,15 +49,11 @@ export default async function tool(input: Input): Promise<DetonateToolResult> {
 
   let screenshotPath: string | undefined;
   if (screenshotB64) {
-    screenshotPath = join(
-      environment.supportPath,
-      `detonate-${Date.now()}.png`,
-    );
+    screenshotPath = join(environment.supportPath, `analyze-${Date.now()}.png`);
     await writeFile(screenshotPath, Buffer.from(screenshotB64, "base64"));
   }
 
-  const raw = await AI.ask(phishingPrompt(input.url, html), {
-    model: detonateModel(),
+  const raw = await AI.ask(analyzePrompt(input.url, html), {
     creativity: "low",
   });
   const verdict = parseVerdict(raw);

@@ -9,7 +9,7 @@ export async function resolveUrl(argUrl?: string): Promise<string | null> {
     const selected = (await getSelectedText()).trim();
     if (isLikelyUrl(selected)) return selected;
   } catch {
-    // No selection — fall through
+    // No selection - fall through
   }
 
   const clip = (await Clipboard.readText())?.trim() ?? "";

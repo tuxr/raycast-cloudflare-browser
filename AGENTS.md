@@ -1,6 +1,6 @@
-# CLAUDE.md
+# AGENTS.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to AI coding agents when working with code in this repository.
 
 ## Project
 
@@ -23,30 +23,31 @@ For local dev: quit Raycast (`⌘Q`) and restart `npm run dev` whenever **assets
 
 ## Architecture
 
-Six user-invoked commands plus four AI Chat tools, sharing a thin `src/lib/` layer.
+Five user-invoked commands plus four AI Chat tools, sharing a thin `src/lib/` layer.
 
 ### Surfaces
 
-- **Commands** (`src/*.tsx`): `screenshot`, `pdf`, `markdown`, `links`, `scrape`, `detonate`. Each is a Raycast `view`-mode entry registered in `package.json` `commands[]`.
-- **AI Tools** (`src/tools/*.ts`): `screenshot`, `extract-markdown`, `extract-links`, `detonate`. Registered in `package.json` `tools[]`. Exposed to Raycast AI Chat as "Ask Cloudflare Browser". The `ai.instructions` field in `package.json` is load-bearing; it tells Raycast AI which tool to pick for which intent class.
+- **Commands** (`src/*.tsx`): `screenshot`, `pdf`, `markdown`, `links`, `analyze`. Each is a Raycast `view`-mode entry registered in `package.json` `commands[]`.
+- **AI Tools** (`src/tools/*.ts`): `screenshot`, `extract-markdown`, `extract-links`, `analyze`. Registered in `package.json` `tools[]`. Exposed to Raycast AI Chat as "Ask Cloudflare Browser". The `ai.instructions` field in `package.json` is load-bearing; it tells Raycast AI which tool to pick for which intent class.
 
-PDF and Scrape are intentionally not exposed as tools. PDF is a user-action (you want a file, not data for reasoning), and Scrape requires CSS selectors which models cannot reliably construct from natural language.
+PDF is intentionally not exposed as a tool (it produces a file, not data for reasoning). There is no longer a Scrape command.
 
 ### Shared library (`src/lib/`)
 
 - **`client.ts`**: `callBrowserRun(endpoint, opts)` is the only Cloudflare API entry. Throws typed errors:
   - `MissingPreferencesError` when account ID or API token are empty
   - `BrowserRunError` for non-2xx responses, with `isAuthError` (401/403), `isRateLimit` (429), and `retryAfterSeconds` (parsed from the `Retry-After` header) getters
-- **`error-ux.tsx`**: `handleBrowserRunError(err)` returns a `RenderableError { title, body, metadata? }`. Commands set this into a single `error` state, and the JSX renders `errorMarkdown(error)` plus `error?.metadata` (which fills the `Detail.Metadata` sidebar for rate-limit errors). `HelpActions` is a shared Action-panel fragment with `⌘H` (Create API Token) and "Open Extension Preferences".
+- **`error-ux.tsx`**: `handleBrowserRunError(err)` returns a `RenderableError { title, body, metadata? }`. Commands set this into a single `error` state, and the JSX renders `errorMarkdown(error)` plus `error?.metadata` (rate-limit sidebar). `HelpActions` is a shared Action-panel fragment that only contains "Open Extension Preferences". Dedicated `MissingPreferencesEmptyView` and `MissingPreferencesActions` components provide a clean first-run / unauthenticated experience.
 - **`url-input.ts`**: `resolveUrl(argUrl?)` does the standard 3-tier fallback: command argument, then selected text, then clipboard.
-- **`detonate-schema.ts`**: Phishing prompt builder, `parseVerdict()` with shape validation, `renderReport()` for the "Copy Markdown Report" action. The prompt is HTML-aware (mentions `<form action>`, password inputs, brand impersonation) because Detonate uses `/snapshot`, not `/markdown`.
-- **`ai-model.ts`**: `detonateModel()` reads the `aiModel` preference and returns either an `AI.Model` value or `undefined`. Returning `undefined` makes `AI.ask` use the user's Raycast-global default model. That is the "Use Raycast Default" dropdown entry.
+- **`analyze-schema.ts`**: Security analysis prompt builder (`analyzePrompt`), `parseVerdict()` with shape validation, and `renderReport()` for the "Copy Markdown Report" action. The prompt is HTML-aware because Analyze uses `/snapshot` (not `/markdown`).
 
-### Detonate URL specifics
+### Analyze specifics
 
-Detonate calls **`/snapshot`** (single Cloudflare browser launch returning base64 screenshot plus HTML), NOT `/screenshot` + `/markdown` in parallel. The parallel approach instantly trips the Free-plan "2 browsers/min" cap. Pass HTML (not Markdown) to `AI.ask` because phishing signals like `<form action="…">`, password inputs, and brand `<link>` references are stripped by Markdown conversion.
+Analyze calls **`/snapshot`** (single Cloudflare browser launch returning base64 screenshot + HTML). It passes the raw HTML to Raycast AI (via `analyzePrompt`) because phishing signals (`<form action>`, password inputs, brand references) are stripped by Markdown conversion.
 
-The AI returns JSON which we `JSON.parse` after stripping any code fences. If the model returns malformed JSON, we throw "AI response did not match the expected schema", which is handled by `handleBrowserRunError` as a generic failure.
+The AI returns JSON which we `JSON.parse` after stripping any code fences. If the model returns malformed JSON, we throw "AI response did not match the expected schema".
+
+Analyze always uses the user's global Raycast AI default model (no per-extension model override preference).
 
 ## Critical conventions
 
@@ -98,10 +99,10 @@ This URL-encodes spaces as `%20` correctly.
 
 ## Memory
 
-The project has persistent memory at `~/.claude/projects/-Users-dariussumpter-Documents-Programming-ray-browser/memory/` with detailed notes on the architectural decisions, user preferences (terse copy, no em-dashes, useRef guards), and historical context. The index is at `memory/MEMORY.md`. Check it before re-investigating questions like "why are we using Raycast AI vs Cloudflare /json" or "why does Detonate use /snapshot".
+The project has persistent memory at `~/.claude/projects/-Users-dariussumpter-Documents-Programming-ray-browser/memory/` with detailed notes on the architectural decisions, user preferences (terse copy, no em-dashes, useRef guards), and historical context. The index is at `memory/MEMORY.md`. Check it before re-investigating questions like "why are we using Raycast AI vs Cloudflare /json" or "why does Analyze use /snapshot".
 
 ## Pricing and quota constraints
 
 - **Cloudflare Browser Run free tier**: 10 min/day, ~2 new browsers/min. Workers Paid: 10 hrs/month, 10 browsers/min.
-- **Raycast AI** (used by Detonate command and detonate tool): 10 req/min, 100 req/hr; requires Raycast Pro.
-- Detonate is the only Pro-gated command; the other five work on any Raycast plan.
+- **Raycast AI** (used by the Analyze command and analyze tool): 10 req/min, 100 req/hr; requires Raycast Pro.
+- Analyze is the only Pro-gated command; the other four commands work on any Raycast plan.
