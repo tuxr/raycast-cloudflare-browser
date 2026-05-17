@@ -35,7 +35,7 @@ import {
 } from "./lib/analyze-schema";
 
 type Arguments = {
-  url?: string;
+  url: string;
 };
 
 type SnapshotResponse = {
@@ -59,7 +59,7 @@ export default function Command(props: LaunchProps<{ arguments: Arguments }>) {
     ranRef.current = true;
     void (async () => {
       try {
-        const target = await resolveUrl(props.arguments?.url);
+        const target = await resolveUrl(props.arguments.url);
         if (!target) {
           setError(await failNoUrl());
           return;
@@ -78,16 +78,18 @@ export default function Command(props: LaunchProps<{ arguments: Arguments }>) {
 
         const screenshotB64 = snapshot.result?.screenshot;
         const html = (snapshot.result?.content ?? "").trim();
-        if (!screenshotB64 || !html) {
+        if (!html) {
           throw new Error("Couldn't extract content from the page.");
         }
 
-        const outPath = join(
-          environment.supportPath,
-          `analyze-${Date.now()}.png`,
-        );
-        await writeFile(outPath, Buffer.from(screenshotB64, "base64"));
-        setImagePath(outPath);
+        if (screenshotB64) {
+          const outPath = join(
+            environment.supportPath,
+            `analyze-${Date.now()}.png`,
+          );
+          await writeFile(outPath, Buffer.from(screenshotB64, "base64"));
+          setImagePath(outPath);
+        }
 
         toast.title = "Analyzing…";
 

@@ -23,31 +23,29 @@ For local dev: quit Raycast (`⌘Q`) and restart `npm run dev` whenever **assets
 
 ## Architecture
 
-Five user-invoked commands plus four AI Chat tools, sharing a thin `src/lib/` layer.
+Five user-invoked commands + four AI tools, sharing a thin `src/lib/` layer.
 
 ### Surfaces
 
-- **Commands** (`src/*.tsx`): `screenshot`, `pdf`, `markdown`, `links`, `analyze`. Each is a Raycast `view`-mode entry registered in `package.json` `commands[]`.
-- **AI Tools** (`src/tools/*.ts`): `screenshot`, `extract-markdown`, `extract-links`, `analyze`. Registered in `package.json` `tools[]`. Exposed to Raycast AI Chat as "Ask Cloudflare Browser". The `ai.instructions` field in `package.json` is load-bearing; it tells Raycast AI which tool to pick for which intent class.
+- **Commands** (`src/*.tsx`): `screenshot`, `pdf`, `markdown`, `links`, `analyze`. All are `view` mode.
+- **AI Tools** (`src/tools/*.ts`): `screenshot`, `extract-markdown`, `extract-links`, `analyze`.
 
-PDF is intentionally not exposed as a tool (it produces a file, not data for reasoning). There is no longer a Scrape command.
+PDF is intentionally **not** exposed as a tool (it produces a file for the user, not data for reasoning). The old "Scrape" command was removed entirely.
 
 ### Shared library (`src/lib/`)
 
-- **`client.ts`**: `callBrowserRun(endpoint, opts)` is the only Cloudflare API entry. Throws typed errors:
-  - `MissingPreferencesError` when account ID or API token are empty
-  - `BrowserRunError` for non-2xx responses, with `isAuthError` (401/403), `isRateLimit` (429), and `retryAfterSeconds` (parsed from the `Retry-After` header) getters
-- **`error-ux.tsx`**: `handleBrowserRunError(err)` returns a `RenderableError { title, body, metadata? }`. Commands set this into a single `error` state, and the JSX renders `errorMarkdown(error)` plus `error?.metadata` (rate-limit sidebar). `HelpActions` is a shared Action-panel fragment that only contains "Open Extension Preferences". Dedicated `MissingPreferencesEmptyView` and `MissingPreferencesActions` components provide a clean first-run / unauthenticated experience.
-- **`url-input.ts`**: `resolveUrl(argUrl?)` does the standard 3-tier fallback: command argument, then selected text, then clipboard.
-- **`analyze-schema.ts`**: Security analysis prompt builder (`analyzePrompt`), `parseVerdict()` with shape validation, and `renderReport()` for the "Copy Markdown Report" action. The prompt is HTML-aware because Analyze uses `/snapshot` (not `/markdown`).
+- **`client.ts`**: Single entry point for Cloudflare Browser Run. Throws `MissingPreferencesError` or `BrowserRunError` (with `isAuthError`, `isRateLimit`, and `retryAfterSeconds` helpers).
+- **`error-ux.tsx`**: Centralized error handling + `RenderableError`. Includes `MissingPreferencesEmptyView` / `MissingPreferencesActions` for a clean first-run experience, plus `HelpActions` (now only "Open Extension Preferences").
+- **`url-input.ts`**: `resolveUrl()` — argument → selected text → clipboard (with `isLikelyUrl` guard).
+- **`analyze-schema.ts`**: Prompt builder (`analyzePrompt`), strict JSON schema validation (`parseVerdict`), and report renderer. Uses raw HTML from `/snapshot` (not Markdown) so the model can see forms, password fields, and brand signals.
 
-### Analyze specifics
+### Analyze command/tool
 
-Analyze calls **`/snapshot`** (single Cloudflare browser launch returning base64 screenshot + HTML). It passes the raw HTML to Raycast AI (via `analyzePrompt`) because phishing signals (`<form action>`, password inputs, brand references) are stripped by Markdown conversion.
+- Uses a **single** `/snapshot` call (HTML + optional base64 screenshot).
+- Always respects the user's global Raycast AI default (no per-extension model override).
+- The command view and the AI tool share the same prompt + parsing logic.
 
-The AI returns JSON which we `JSON.parse` after stripping any code fences. If the model returns malformed JSON, we throw "AI response did not match the expected schema".
-
-Analyze always uses the user's global Raycast AI default model (no per-extension model override preference).
+The `required: true` change on the `url` argument (May 2026) means commands now reliably focus the argument input on launch, while still falling back to selection/clipboard when the user submits an empty or invalid value.
 
 ## Critical conventions
 

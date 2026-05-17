@@ -30,76 +30,76 @@
   "commands": [
     {
       "name": "screenshot",
-      "title": "Screenshot",
+      "title": "Screenshot URL",
       "subtitle": "Cloudflare Browser",
-      "description": "Capture a screenshot of any URL.",
+      "description": "Capture a screenshot of any URL on Cloudflare's edge.",
       "mode": "view",
       "arguments": [
         {
           "name": "url",
           "type": "text",
           "placeholder": "URL",
-          "required": false
+          "required": true
         }
       ]
     },
     {
       "name": "pdf",
-      "title": "PDF",
+      "title": "Export PDF",
       "subtitle": "Cloudflare Browser",
-      "description": "Render any URL to PDF.",
+      "description": "Export any URL as a PDF document.",
       "mode": "view",
       "arguments": [
         {
           "name": "url",
           "type": "text",
           "placeholder": "URL",
-          "required": false
+          "required": true
         }
       ]
     },
     {
       "name": "markdown",
-      "title": "Markdown",
+      "title": "Extract Markdown",
       "subtitle": "Cloudflare Browser",
-      "description": "Convert any webpage to clean Markdown.",
+      "description": "Extract clean Markdown from any webpage.",
       "mode": "view",
       "arguments": [
         {
           "name": "url",
           "type": "text",
           "placeholder": "URL",
-          "required": false
+          "required": true
         }
       ]
     },
     {
       "name": "links",
-      "title": "Links",
+      "title": "Extract Links",
       "subtitle": "Cloudflare Browser",
-      "description": "Extract every link on a webpage with hostnames.",
+      "description": "Extract every link from a webpage, including hostnames.",
       "mode": "view",
       "arguments": [
         {
           "name": "url",
           "type": "text",
           "placeholder": "URL",
-          "required": false
+          "required": true
         }
       ]
     },
     {
       "name": "analyze",
-      "title": "Analyze",
+      "title": "Analyze URL",
       "subtitle": "Cloudflare Browser",
-      "description": "Run AI security analysis on a URL for phishing, login forms, and brand impersonation. Requires Raycast Pro.",
+      "description": "Analyze a URL for phishing, brand impersonation, and security risks using AI. Requires Raycast Pro.",
       "mode": "view",
       "arguments": [
         {
           "name": "url",
           "type": "text",
           "placeholder": "URL",
-          "required": false
+          "required": true
         }
       ]
     }

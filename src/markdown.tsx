@@ -20,7 +20,7 @@ import {
 } from "./lib/error-ux";
 
 type Arguments = {
-  url?: string;
+  url: string;
 };
 
 type MarkdownResponse = {
@@ -40,7 +40,7 @@ export default function Command(props: LaunchProps<{ arguments: Arguments }>) {
     ranRef.current = true;
     void (async () => {
       try {
-        const target = await resolveUrl(props.arguments?.url);
+        const target = await resolveUrl(props.arguments.url);
         if (!target) {
           setError(await failNoUrl());
           return;
@@ -73,11 +73,17 @@ export default function Command(props: LaunchProps<{ arguments: Arguments }>) {
     ? errorMarkdown(error)
     : (content ?? `# Loading…\n\n${url ? `\`${url}\`` : ""}`);
 
+  const successMetadata = content ? (
+    <Detail.Metadata>
+      {url && <Detail.Metadata.Link title="Source" target={url} text={url} />}
+    </Detail.Metadata>
+  ) : undefined;
+
   return (
     <Detail
       isLoading={isLoading}
       markdown={markdown}
-      metadata={error?.metadata}
+      metadata={error?.metadata ?? successMetadata}
       actions={
         <ActionPanel>
           {error?.title === "Not Configured" ? (

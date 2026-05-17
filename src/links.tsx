@@ -20,7 +20,7 @@ import {
 } from "./lib/error-ux";
 
 type Arguments = {
-  url?: string;
+  url: string;
 };
 
 type RawLink = string | { href?: string; text?: string };
@@ -48,7 +48,7 @@ export default function Command(props: LaunchProps<{ arguments: Arguments }>) {
     ranRef.current = true;
     void (async () => {
       try {
-        const target = await resolveUrl(props.arguments?.url);
+        const target = await resolveUrl(props.arguments.url);
         if (!target) {
           setError(await failNoUrl());
           return;
